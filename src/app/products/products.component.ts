@@ -86,7 +86,13 @@ export class ProductsComponent implements OnInit{
     this.position = dialogPosition;
     this.visibleEdit = true;
     this.selectedProductEdit = product;
-    this.productForm.patchValue(this.selectedProductEdit)
+    this.productForm.patchValue({
+      title: this.selectedProductEdit.Title,
+      price: this.selectedProductEdit.Price,
+      description: this.selectedProductEdit.Description,
+      category: this.selectedProductEdit.Category,
+      image: this.selectedProductEdit.Image
+    });
   }
 
   addProduct() {
@@ -111,11 +117,14 @@ export class ProductsComponent implements OnInit{
   }
 
   editProduct() {
-    this.productsService.UpdateProduct(this.selectedProductEdit, this.productForm.patchValue(this.selectedProductEdit)).subscribe(
-      response => {
+    this.productsService.UpdateProduct(this.selectedProductEdit.ID, this.productForm.value).subscribe(
+      (response: any) => {
         this.clickEdit.emit(response);
         this.closeModal();
         this.messageService.add({ severity: 'success', summary: 'Success', detail: 'Success update product' });
+
+        this.loadProducts();
+        this.products.push(response.data);
 
         if (this.table) {
           this.table.reset();

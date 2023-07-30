@@ -38,7 +38,7 @@ export class ProductsService{
   UpdateProduct(id: string, data: any): Observable<Product> {
     return this.http
       .put<Product>(
-        this.baseUrl + '/product/' + id,
+        this.baseUrl + '/products/' + id,
         JSON.stringify(data),
         this.httpOptions
       )
