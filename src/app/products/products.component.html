@@ -1,0 +1,341 @@
+<div class="container">
+    <div class="block font-bold border-round mb-3 px-4">
+        <div class="grid">
+            <div class="col-6">
+                <div class="border-round-sm font-bold">
+                    <h2 class="pt-4">Products Data</h2>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="block font-bold text-center border-round mb-3 px-4">     
+        <p-table
+        styleClass="border-1 border-solid border-200"
+        #dt1
+        [value]="products"
+        dataKey="id"
+        [rows]="10"
+        [showCurrentPageReport]="true"
+        [rowsPerPageOptions]="[10, 25, 50, 100]"
+        [loading]="loading"
+        [paginator]="true"
+        currentPageReportTemplate="Showing {first} to {last} of {totalRecords} entries"
+        [globalFilterFields]="['title', 'brand', 'category']"
+        >
+        <ng-template pTemplate="caption">
+            <div class="flex">
+                <p-button label="Add" (click)="showDialogAdd('top')"><i class="pi pi-plus mr-2"></i></p-button>
+                <span class="p-input-icon-left ml-auto">
+                    <i class="pi pi-search"></i>
+                    <input pInputText type="text" (input)="onInputChange($event)" placeholder="Search keyword" />
+                </span>
+            </div>
+        </ng-template>
+        <ng-template pTemplate="header">
+            <tr>
+                <th style="min-width:15rem">
+                    <div class="flex align-items-center">
+                        Title
+                    </div>
+                </th>
+                <th style="min-width:8rem">
+                    <div class="flex align-items-center">
+                        Price
+                    </div>
+                </th>
+                <th style="min-width:10rem">
+                    <div class="flex align-items-center">
+                        Category
+                    </div>
+                </th>
+                <th style="min-width:15rem">
+                    <div class="flex align-items-center">
+                        Description
+                    </div>
+                </th>
+                <th style="min-width:8rem;">
+                    <div class="flex align-items-center">
+                        Image
+                    </div>
+                </th>
+                <th style="min-width:12rem">
+                    <div class="flex align-items-center">
+                        Action
+                    </div>
+                </th>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="body" let-product styleClass="inline-block">
+            <tr>
+                <td>
+                    {{ product.Title }}
+                </td>
+                <td>
+                    ${{ product.Price }}
+                </td>
+                <td>
+                    {{ product.Category }}
+                </td>
+                <td>
+                    {{ product.Description }}
+                </td>
+                <td>
+                    <div>
+                        <p-image src="{{ product.Image }}" alt="Image" width="60"></p-image>  
+                    </div>                  
+                </td>
+                <td >
+                    <p-button icon="pi pi-eye" styleClass="p-button-rounded p-button-warning mr-2" (click)="showDialogShow('top', product.ID)"></p-button>
+                    <p-button icon="pi pi-pencil" styleClass="p-button-rounded p-button-success mr-2" (click)="showDialogEdit('top', product)"></p-button>
+                    <p-button (click)="deleteProduct(product.ID)" icon="pi pi-trash" styleClass="p-button-rounded p-button-danger"></p-button>
+                </td>
+            </tr>
+        </ng-template>
+        <ng-template pTemplate="emptymessage">
+            <tr>
+                <td colspan="7" style="text-align: center; vertical-align: middle;">No product found.</td>
+            </tr>
+        </ng-template>
+        </p-table>
+    </div>
+</div>
+
+<p-dialog
+  header="Add Product"
+  [(visible)]="visibleAdd"
+  [modal]="true"
+  [style]="{ width: '50vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="closeModal()"
+>
+  <form [formGroup]="productForm" class="product-form">
+    <div class="field">
+      <label class="block" for="title">Title</label>
+      <input type="text" pInputText id="title" formControlName="title" />
+      <small
+        class="p-error block"
+        *ngIf="
+          productForm.controls['title'].invalid &&
+          productForm.controls['title'].dirty
+        "
+        >Field is required</small
+      >
+    </div>
+    <div class="field">
+      <label class="block" for="price">Price</label>
+      <p-inputNumber
+        id="price"
+        formControlName="price"
+        class="block"
+      ></p-inputNumber>
+      <small
+        class="p-error block"
+        *ngIf="
+          productForm.controls['price'].invalid &&
+          productForm.controls['price'].dirty
+        "
+        >Field is required</small
+      >
+    </div>
+    <div class="field">
+      <label class="block">Description</label>
+      <textarea pInputTextarea formControlName="description" rows="5" cols="30" style="width: 100%; resize:none;"></textarea>
+    </div>
+    <div class="field">
+      <label class="block" for="image">Image</label>
+      <input type="text" pInputText id="image" formControlName="image" />
+      <small
+        class="p-error block"
+        *ngIf="
+          productForm.controls['image'].invalid &&
+          productForm.controls['image'].dirty
+        "
+        >Field is required</small
+      >
+    </div>
+    <div class="field">
+      <label class="block" for="category">Category</label>
+      <input type="text" pInputText id="category" formControlName="category" />
+      <small
+        class="p-error block"
+        *ngIf="
+          productForm.controls['category'].invalid &&
+          productForm.controls['category'].dirty
+        "
+        >Field is required</small
+      >
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <p-button
+      (click)="closeModal()"
+      label="Reset"
+      styleClass="p-button-text"
+    ></p-button>
+
+    <p-button
+      (click)="addProduct()"
+      label="Submit"
+      [disabled]="productForm.invalid"
+    ></p-button>
+  </ng-template>
+</p-dialog>
+
+<p-dialog
+  header="Details Product"
+  [(visible)]="visibleShow"
+  [modal]="true"
+  [style]="{ width: '50vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="closeModal()"
+>
+<div *ngIf="selectedProduct">
+    <div class="grid">
+        <div class="col-fixed" style="width:100px">
+            <div class="font-bold">
+                <p>Image</p>
+            </div>
+        </div>
+        <div class="col">
+            <div class="text-center">
+                <p-image src="{{ selectedProduct.data.Image }}" alt="Product Image" width="200"></p-image>
+            </div>
+        </div>
+    </div>
+    <div class="grid">
+        <div class="col-fixed" style="width:100px">
+            <div class="font-bold">
+                <p>Title</p>
+            </div>
+        </div>
+        <div class="col">
+            <div>
+                <p> {{ selectedProduct.data.Title }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="grid">
+        <div class="col-fixed" style="width:100px">
+            <div class="font-bold">
+                <p>Price</p>
+            </div>
+        </div>
+        <div class="col">
+            <div>
+                <p> ${{ selectedProduct.data.Price }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="grid">
+        <div class="col-fixed" style="width:100px">
+            <div class="font-bold">
+                <p>Category</p>
+            </div>
+        </div>
+        <div class="col">
+            <div>
+                <p> {{ selectedProduct.data.Category }}</p>
+            </div>
+        </div>
+    </div>
+    <div class="grid">
+        <div class="col-fixed" style="width:100px">
+            <div class="font-bold">
+                <p>Description</p>
+            </div>
+        </div>
+        <div class="col">
+            <div>
+                <p> {{ selectedProduct.data.Description }}</p>
+            </div>
+        </div>
+    </div>
+</div>
+</p-dialog>
+
+<p-dialog
+  header="Update Product"
+  [(visible)]="visibleEdit"
+  [modal]="true"
+  [style]="{ width: '50vw' }"
+  [draggable]="false"
+  [resizable]="false"
+  (onHide)="closeModal()"
+>
+  <form [formGroup]="productForm" class="product-form">
+    <div class="field">
+      <label class="block" for="title">Title</label>
+      <input type="text" pInputText id="title" formControlName="title"/>
+      <small
+        class="p-error block"
+        *ngIf="
+          productForm.controls['title'].invalid &&
+          productForm.controls['title'].dirty
+        "
+        >Field is required</small
+      >
+    </div>
+    <div class="field">
+      <label class="block" for="price">Price</label>
+      <p-inputNumber
+        id="price"
+        formControlName="price"
+        class="block"
+      ></p-inputNumber>
+      <small
+        class="p-error block"
+        *ngIf="
+          productForm.controls['price'].invalid &&
+          productForm.controls['price'].dirty
+        "
+        >Field is required</small
+      >
+    </div>
+    <div class="field">
+      <label class="block">Description</label>
+      <textarea pInputTextarea formControlName="description" rows="5" cols="30" style="width: 100%; resize:none;"></textarea>
+    </div>
+    <div class="field">
+      <label class="block" for="image">Image</label>
+      <input type="text" pInputText id="image" formControlName="image" />
+      <small
+        class="p-error block"
+        *ngIf="
+          productForm.controls['image'].invalid &&
+          productForm.controls['image'].dirty
+        "
+        >Field is required</small
+      >
+    </div>
+    <div class="field">
+      <label class="block" for="category">Category</label>
+      <input type="text" pInputText id="category" formControlName="category" />
+      <small
+        class="p-error block"
+        *ngIf="
+          productForm.controls['category'].invalid &&
+          productForm.controls['category'].dirty
+        "
+        >Field is required</small
+      >
+    </div>
+  </form>
+  <ng-template pTemplate="footer">
+    <p-button
+      (click)="closeModal()"
+      label="Reset"
+      styleClass="p-button-text"
+    ></p-button>
+
+    <p-button
+      (click)="editProduct()"
+      label="Submit"
+      [disabled]="productForm.invalid"
+    ></p-button>
+  </ng-template>
+</p-dialog>
+
+<p-confirmDialog [style]="{width: '50vw'}"></p-confirmDialog>
+<p-toast position="bottom-right"></p-toast>

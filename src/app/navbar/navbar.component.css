@@ -1,0 +1,21 @@
+/* Default styles for the tab menu */
+.responsive-tabmenu-container {
+    display: flex;
+    justify-content: center; /* Center the tab menu items horizontally */
+    background-color: #f2f2f2; /* Background color for the tab menu */
+  }
+  
+  /* Media query for smaller screens */
+  @media (max-width: 600px) {
+    .responsive-tabmenu-container {
+      flex-direction: column; /* Display tab menu items in a column */
+      align-items: center; /* Center the tab menu items vertically */
+      padding: 10px 0; /* Add padding between the tab menu items */
+      width: 100%;
+  
+      /* Additional styles for smaller screens */
+      background-color: #eaeaea; /* Adjust background color for smaller screens */
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2); /* Add a shadow effect */
+    }
+  }
+  
